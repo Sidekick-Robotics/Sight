@@ -12,8 +12,7 @@ import numpy as np
 import serial
 import serial.tools.list_ports
 
-from globals import GRAPH_BEGINNING, START_REC, END_REC
-
+from SideKick.globals import GRAPH_BEGINNING, START_REC, END_REC
 
 class DeviceManager():
     """
@@ -360,6 +359,9 @@ class DeviceManager():
             if self.target is not None and (self.target in available_ports):
                 self.connect_serial(self.target)
                 time.sleep(1)
+
+        if len(available_ports) == 0:
+            available_ports = ["N/A"]
 
         return available_ports
 

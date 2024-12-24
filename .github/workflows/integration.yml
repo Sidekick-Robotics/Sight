@@ -3,17 +3,16 @@ name: Integration testing
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - '*'
   pull_request:
     branches: [ "main" ]
-  schedule:
-    - cron: "0 0 * * *"
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  integration:
     strategy:
       matrix:
         os: ['ubuntu-latest', windows-latest, macos-latest]

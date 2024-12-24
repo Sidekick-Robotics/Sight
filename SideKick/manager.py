@@ -7,9 +7,9 @@ import webbrowser
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtWidgets as qtw
 
-from Ui.ManagerUi import Ui_MainWindow as manager
+from SideKick.user_interface.ManagerUi import Ui_MainWindow as manager
 
-from globals import SELECTED_WIDGET_QSS, NORMAL_WIDGET_QSS
+from SideKick.globals import SELECTED_WIDGET_QSS, NORMAL_WIDGET_QSS
 
 def library_no_results():
     """
@@ -42,7 +42,7 @@ class ManagerWidget(qtw.QTextBrowser):
         self.name = name
         self.index = index
         self.parent = parent
-        self.versions = versions
+        self.versions = reversed(versions)
 
         super().__init__(parent)
 
