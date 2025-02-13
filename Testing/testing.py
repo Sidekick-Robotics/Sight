@@ -8,8 +8,8 @@ import unittest
 parent = os.path.abspath('.')
 sys.path.insert(1, parent)
 
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtTest import QTest
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtTest import QTest
 
 from main import MainGUI
 
