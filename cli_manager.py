@@ -1,6 +1,7 @@
 """
 The cli manager file.
 """
+import multiprocessing
 import subprocess
 import threading
 import time
@@ -27,6 +28,21 @@ class CliManager:
         self.running = False
         self.enabled = True
 
+        process = multiprocessing.Process(target=self.update_if_signal)  # Run the function in a separate process
+        process.start()
+        process.join(10)  # Wait for the process to finish within the timeout
+        if process.is_alive():
+            print("Timeout reached, terminating process...")
+            process.terminate()  # Forcefully terminate the process if it exceeds timeout
+            process.join()  # Ensure the process has been cleaned up
+        else:
+            print("Function completed successfully")
+
+    def update_if_signal(self):
+        """
+        Run the update_core_index and update_library_index functions and as they are
+        internet dependant, have a timeout incase of lack of signal.
+        """
         self.update_core_index()
         self.update_library_index()
 

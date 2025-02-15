@@ -5,10 +5,12 @@ deletion of files.
 
 import os
 import re
+import ctypes
 import shutil
 import platform
 import json
 
+from pathlib import Path
 from PyQt6 import QtWidgets as qtw
 
 from globals import SIZES_IN_QSS
@@ -330,6 +332,10 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
 
         self.user = os.getenv("USER") or os.getenv("USERNAME")
         self.path = os.path.dirname(os.path.realpath(__file__))
+        print(self.path)
+        if "_internal" in self.path:
+            self.path = str(Path(self.path).resolve().parent)
+        print(self.path)
         self.save_manager = SaveManager()
         self.dev = dev
         self.consci_os_path = consci_os_path
@@ -363,7 +369,6 @@ Library{self.sep}Arduino15{self.sep}library_index.json"
 Library{self.sep}Arduino15{self.sep}package_index.json"
 
         elif operating_system == "Linux":
-
             self.arduino_cli = "arduino-cli-linux.sh"
             self.sep = "/"
             inc = "/home/"
@@ -383,20 +388,29 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         # Definitions for paths which are referenced for file locations
         self.paths["documents"] = f"{inc}{self.user}{self.sep}{documents}"
         self.paths["sidekick"] = f"""{self.paths["documents"]}{self.sep}Sight"""
-        self.paths["appdata"] = f"{inc}{self.user}{self.sep}AppData{self.sep}Local"
-        self.paths["settings_path"] = f"""{self.paths["appdata"]}Sight{self.sep}\
-{self.sep}Settings"""
+
+        if operating_system == "Windows":
+            self.paths["appdata"] = f"{inc}{self.user}{self.sep}AppData{self.sep}Local"
+            self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}\
+Sight{self.sep}Settings"""
+        else:
+            # TODO make application follow normal file directories for Linux\unix
+            self.paths["appdata"] = f"{self.path}"
+            self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}Settings"""
 
         # Definitions of file locations
-        self.paths["boards"] = f"""{self.paths["settings_path"]}{self.sep}Settings
+        self.paths["boards"] = f"""{self.paths["settings_path"]}\
 {self.sep}boards.csv"""
-        self.paths["settings"] = f"""{self.paths["settings_path"]}{self.sep}Settings
+        self.paths["settings"] = f"""{self.paths["settings_path"]}\
 {self.sep}settings.txt"""
-        self.paths["stylesheet"] = f"""{self.paths["settings_path"]}{self.sep}Settings
+        self.paths["stylesheet"] = f"""{self.paths["settings_path"]}\
 {self.sep}stylesheet.qss"""
-        self.paths["arduino"] = f"{self.path}{self.sep}Externals{self.sep}{self.arduino_cli}"
-        self.paths["actuator"] = f"""{self.path}{self.sep}Examples
+        self.paths["arduino"] = f"{self.path}{self.sep}Externals{self.sep}\
+{self.arduino_cli}"
+        self.paths["actuator"] = f"""{self.path}{self.sep}Examples\
 {self.sep}Actuators_Test{self.sep}Actuators_Test.ino"""
+        self.paths["stylesheet_template"] = f"""{self.path}{self.sep}Settings\
+{self.sep}stylesheet.qss"""
 
         # User accessible files
         self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
@@ -431,9 +445,9 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         if "Sight" not in directories:
             os.mkdir(self.paths["sidekick"])
 
-        directories = os.lsitdir(self.paths["settings_path"])
+        directories = os.listdir(self.paths["appdata"])
         if "Sight" not in directories:
-            os.mkdir(self.paths["sight_data"])
+            os.makedirs(self.paths["settings_path"])
 
     def create_sub_sidekick_files(self):
         """
@@ -452,20 +466,24 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
 
         directories = os.listdir(self.paths["settings_path"])
 
-        if "settings.txt" not in directories:
-            with open(self.paths["settings"], "w", encoding="UTF-8") as settings:
-                settings.write(DEFAULT_SETTINGS)
+        try:
+            if "settings.txt" not in directories:
+                with open(self.paths["settings"], "x", encoding="UTF-8") as settings:
+                    settings.write(DEFAULT_SETTINGS)
 
-        if "boards.csv" not in directories:
-            with open(self.paths["boards"], "a", encoding="UTF-8") as _:
-                pass
-            self.update_boards()
+            if "boards.csv" not in directories:
+                with open(self.paths["boards"], "x", encoding="UTF-8") as _:
+                    pass
+                self.update_boards()
 
-        if "stylesheet" not in directories:
-            with open(self.paths["stylesheet"], "w", encoding="UTF-8") as settings:
-                settings.write(DEFAULT_SETTINGS)
-            with open(self.paths["stylesheet"], "w", encoding="UTF-8") as settings:
-                settings.write(DEFAULT_SETTINGS)
+            if "stylesheet.qss" not in directories:
+                shutil.copy(self.paths["stylesheet_template"], self.paths["stylesheet"])
+
+        except PermissionError:
+            # Get admin permissions if needed
+            # TODO add message box
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", "python", __file__, None, 1)
+            self.create_sub_sidekick_files()
 
     def move_source(self, raw_source):
         """
@@ -670,7 +688,7 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         Gets all of the boards from ./Ui/boards.csv so
         that they can be displayed on the GUI.
         """
-
+        # TODO speed this up.
         with open(self.paths["boards"], "r", encoding="UTF-8") as boards:
             for line in boards:
                 self.board_names.append(line.strip().split(", "))
