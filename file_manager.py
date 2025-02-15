@@ -378,17 +378,31 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         else:
             raise OSError("Invalis OS. Shutting down.")
 
-        self.paths = {"documents" : f"{inc}{self.user}{self.sep}{documents}",
-"boards" : f"{self.path}{self.sep}Settings{self.sep}boards.csv",
-"settings" : f"{self.path}{self.sep}Settings{self.sep}settings.txt",
-"settings_path" : f"{self.path}{self.sep}Settings",
-"arduino" : f"{self.path}{self.sep}Externals{self.sep}{self.arduino_cli}",
-"actuator" : f"{self.path}{self.sep}Examples{self.sep}Actuators_Test{self.sep}Actuators_Test.ino"}
+        self.paths = {}
 
-        self.paths["sidekick"] = f"""{self.paths["documents"]}{self.sep}SideKick"""
+        # Definitions for paths which are referenced for file locations
+        self.paths["documents"] = f"{inc}{self.user}{self.sep}{documents}"
+        self.paths["sidekick"] = f"""{self.paths["documents"]}{self.sep}Sight"""
+        self.paths["appdata"] = f"{inc}{self.user}{self.sep}AppData{self.sep}Local"
+        self.paths["settings_path"] = f"""{self.paths["appdata"]}Sight{self.sep}\
+{self.sep}Settings"""
+
+        # Definitions of file locations
+        self.paths["boards"] = f"""{self.paths["settings_path"]}{self.sep}Settings
+{self.sep}boards.csv"""
+        self.paths["settings"] = f"""{self.paths["settings_path"]}{self.sep}Settings
+{self.sep}settings.txt"""
+        self.paths["stylesheet"] = f"""{self.paths["settings_path"]}{self.sep}Settings
+{self.sep}stylesheet.qss"""
+        self.paths["arduino"] = f"{self.path}{self.sep}Externals{self.sep}{self.arduino_cli}"
+        self.paths["actuator"] = f"""{self.path}{self.sep}Examples
+{self.sep}Actuators_Test{self.sep}Actuators_Test.ino"""
+
+        # User accessible files
         self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
         self.paths["libraries"] = f"""{self.paths["sidekick"]}{self.sep}Libraries"""
 
+        # Create a save manager object as the user may want to record data
         self.save_manager.save_folder_path = f"""{self.paths["sidekick"]}{self.sep}Saves"""
         self.save_manager.sep = self.sep
 
@@ -414,12 +428,12 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         Creates sidekick directory in documents if it does not already exist
         """
         directories = os.listdir(self.paths["documents"])
-        if "SideKick" not in directories:
+        if "Sight" not in directories:
             os.mkdir(self.paths["sidekick"])
 
-        directories = os.listdir(self.path)
-        if "Settings" not in directories:
-            os.mkdir(self.paths["settings_path"])
+        directories = os.lsitdir(self.paths["settings_path"])
+        if "Sight" not in directories:
+            os.mkdir(self.paths["sight_data"])
 
     def create_sub_sidekick_files(self):
         """
@@ -439,13 +453,19 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         directories = os.listdir(self.paths["settings_path"])
 
         if "settings.txt" not in directories:
-            with open(self.paths["settings"], "a", encoding="UTF-8") as settings:
+            with open(self.paths["settings"], "w", encoding="UTF-8") as settings:
                 settings.write(DEFAULT_SETTINGS)
 
         if "boards.csv" not in directories:
             with open(self.paths["boards"], "a", encoding="UTF-8") as _:
                 pass
             self.update_boards()
+
+        if "stylesheet" not in directories:
+            with open(self.paths["stylesheet"], "w", encoding="UTF-8") as settings:
+                settings.write(DEFAULT_SETTINGS)
+            with open(self.paths["stylesheet"], "w", encoding="UTF-8") as settings:
+                settings.write(DEFAULT_SETTINGS)
 
     def move_source(self, raw_source):
         """
@@ -750,7 +770,7 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         Either increases or decreases the size of the font on the GUI.
         """
         with open(
-            f".{self.sep}Ui{self.sep}stylesheet.qss",
+            self.paths["stylesheet"],
             "r",
             encoding="UTF-8") as sizes:
             scale = float(sizes.readline())
@@ -782,7 +802,7 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
             scale = max(scale, 0.5)
 
         with open(
-            f".{self.sep}Ui{self.sep}stylesheet.qss",
+            self.paths["stylesheet"],
             "w",
             encoding="UTF-8") as sizes:
             scale = round(scale, 1)
@@ -793,7 +813,7 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         Gets the scale from the stylesheet.
         """
         with open(
-            f".{self.sep}Ui{self.sep}stylesheet.qss",
+            self.paths["stylesheet"],
             "r",
             encoding="UTF-8") as scale:
             return float(scale.readline())
@@ -804,7 +824,7 @@ Library{self.sep}Arduino15{self.sep}package_index.json"
         """
 
         with open(
-            f".{self.sep}Ui{self.sep}stylesheet.qss",
+            self.paths["stylesheet"],
             "r",
             encoding="UTF-8") as sizes:
             scale = float(sizes.readline())
