@@ -56,6 +56,12 @@ class MainGUI(qtw.QMainWindow):
 
         self.main_ui.debugger.setVisible(False)
 
+        # Disable some features for initial release
+        self.main_ui.sk_lite.setEnabled(True)
+        self.main_ui.sk_lite.hide()
+        self.main_ui.data_points.hide()
+        self.main_ui.label_2.hide()
+
         self.set_screen_size()
 
         # Associative classes are initialised here
@@ -363,7 +369,7 @@ class MainGUI(qtw.QMainWindow):
                             'Create Folder', self.file_manager.paths["projects"], 'Folders (*)')[0]
 
         if folder_path:
-            self.file_manager.add_new_project(folder_path)
+            self.file_manager.add_new_project(folder_path, main_gui.sk_lite.state)
 
     def connect_device(self, port, last_device_flag=False):
         """
@@ -690,6 +696,13 @@ class MainGUI(qtw.QMainWindow):
         self.cli_manager.terminate()
 
 if __name__ == "__main__":
+
+    # When compiling, sometimes multiple instances open - this prevents that
+    shared_memory = qtc.QSharedMemory("MyUniquePyQt6App")
+    if shared_memory.attach():
+        sys.exit(1)
+
+    shared_memory.create(1)
 
     # Check if the application is being run in development mode
     if "-d" in sys.argv:

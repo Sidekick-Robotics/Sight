@@ -16,7 +16,7 @@ from PyQt6 import QtWidgets as qtw
 from globals import SIZES_IN_QSS
 from globals import DEFAULT_SETTINGS, DEFAULT_BOARDS
 from globals import GRAPH_BEGINNING, GRAPH_ENDING
-
+from globals import CONSCIOS_GIT
 
 class SaveManager():
     """
@@ -398,23 +398,7 @@ Sight{self.sep}Settings"""
             self.paths["appdata"] = f"{self.path}"
             self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}Settings"""
 
-        # Definitions of file locations
-        self.paths["boards"] = f"""{self.paths["settings_path"]}\
-{self.sep}boards.csv"""
-        self.paths["settings"] = f"""{self.paths["settings_path"]}\
-{self.sep}settings.txt"""
-        self.paths["stylesheet"] = f"""{self.paths["settings_path"]}\
-{self.sep}stylesheet.qss"""
-        self.paths["arduino"] = f"{self.path}{self.sep}Externals{self.sep}\
-{self.arduino_cli}"
-        self.paths["actuator"] = f"""{self.path}{self.sep}Examples\
-{self.sep}Actuators_Test{self.sep}Actuators_Test.ino"""
-        self.paths["stylesheet_template"] = f"""{self.path}{self.sep}Settings\
-{self.sep}stylesheet.qss"""
-
-        # User accessible files
-        self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
-        self.paths["libraries"] = f"""{self.paths["sidekick"]}{self.sep}Libraries"""
+        self.define_paths()
 
         # Create a save manager object as the user may want to record data
         self.save_manager.save_folder_path = f"""{self.paths["sidekick"]}{self.sep}Saves"""
@@ -437,9 +421,37 @@ Sight{self.sep}Settings"""
         super(FileManager, self).__init__(arduino_lib_path)
         super(JsonLibraryManager, self).__init__(arduino_board_path)
 
+    def define_paths(self):
+        """
+        Create all of the paths that will be used by the file manager.
+        """
+        # Definitions of file locations
+        self.paths["boards"] = f"""{self.paths["settings_path"]}\
+{self.sep}boards.csv"""
+        self.paths["settings"] = f"""{self.paths["settings_path"]}\
+{self.sep}settings.txt"""
+        self.paths["stylesheet"] = f"""{self.paths["settings_path"]}\
+{self.sep}stylesheet.qss"""
+        self.paths["arduino"] = f"{self.path}{self.sep}Externals{self.sep}\
+{self.arduino_cli}"
+        self.paths["actuator"] = f"""{self.path}{self.sep}Examples\
+{self.sep}Actuators_Test{self.sep}Actuators_Test.ino"""
+        self.paths["stylesheet_template"] = f"""{self.path}{self.sep}Settings\
+{self.sep}stylesheet.qss"""
+        self.paths["conscios"] = f"""{self.paths["appdata"]}{self.sep}Sight{self.sep}ConsciOS"""
+        self.paths["conscios_src"] = f"""{self.paths["conscios"]}{self.sep}Source"""
+        self.paths["conscios_src_lite"] = f"""{self.paths["conscios"]}{self.sep}Source_lite"""
+        self.paths["conscios_lib"] = f"""{self.paths["conscios"]}{self.sep}libraries"""
+        self.paths["git"] = f"{self.path}{self.sep}Git{self.sep}cmd{self.sep}git.exe"
+
+        # User accessible files
+        self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
+        self.paths["libraries"] = f"""{self.paths["sidekick"]}{self.sep}Libraries"""
+
     def create_sidekick_files(self):
         """
         Creates sidekick directory in documents if it does not already exist
+        TODO tidy this up
         """
         directories = os.listdir(self.paths["documents"])
         if "Sight" not in directories:
@@ -448,6 +460,9 @@ Sight{self.sep}Settings"""
         directories = os.listdir(self.paths["appdata"])
         if "Sight" not in directories:
             os.makedirs(self.paths["settings_path"])
+
+        if not os.path.exists(self.paths["conscios"]):
+            self.install_conscios()
 
     def create_sub_sidekick_files(self):
         """
@@ -485,6 +500,13 @@ Sight{self.sep}Settings"""
             ctypes.windll.shell32.ShellExecuteW(None, "runas", "python", __file__, None, 1)
             self.create_sub_sidekick_files()
 
+    def install_conscios(self):
+        """
+        Using git, if there is no ConsciOS available, clone it.
+        """
+        git_cmd = f"""{self.paths["git"]} clone {CONSCIOS_GIT} {self.paths["conscios"]}"""
+        os.system(git_cmd)
+
     def move_source(self, raw_source):
         """
         If the GUI is in dev mode, replace the reference to the source code
@@ -492,18 +514,18 @@ Sight{self.sep}Settings"""
         """
 
         try:
-            shutil.rmtree(f"{self.path}{self.sep}ConsciOS{self.sep}libraries")
-            shutil.rmtree(f"{self.path}{self.sep}ConsciOS{self.sep}Source")
+            shutil.rmtree(self.paths["conscios_lib"])
+            shutil.rmtree(self.paths["conscios_src"])
         except FileNotFoundError:
             pass
 
         source = f"{raw_source}{self.sep}libraries"
-        destination = f"{self.path}{self.sep}ConsciOS{self.sep}libraries"
-        shutil.copytree(source, destination)
+
+        shutil.copytree(source, self.paths["conscios_lib"])
 
         source = f"{raw_source}{self.sep}Source"
-        destination = f"{self.path}{self.sep}ConsciOS{self.sep}Source"
-        shutil.copytree(source, destination)
+
+        shutil.copytree(source, self.paths["conscios_src"])
 
     def move_libraries(self, source=None):
         """
@@ -520,7 +542,7 @@ Sight{self.sep}Settings"""
         destination = f"""{self.paths["libraries"]}{self.sep}libraries"""
 
         if source is None:
-            source = f"{self.path}{self.sep}ConsciOS{self.sep}libraries"
+            source = self.paths["conscios_lib"]
         else:
             source += f"{self.sep}libraries"
 
@@ -551,20 +573,23 @@ Sight{self.sep}Settings"""
         """
         return os.listdir(self.save_manager.save_folder_path)
 
-    def add_new_project(self, project_dir):
+    def add_new_project(self, project_dir, sk_lite):
         """
         Adds new projects when new project is clicked.
         Creates a new file, copies the source reference, then renames the .ino file
 
         Args:
             name (string): the name of the new project from the line edit
+            sk_lite (bool): whether or not to create only a .ino file
         """
         project_dir = project_dir.replace("/", self.sep)
 
-        source = f"{self.path}{self.sep}ConsciOS{self.sep}Source"
         destination = f"{project_dir}"
 
-        shutil.copytree(source, destination)
+        if not sk_lite:
+            shutil.copytree(self.paths["conscios_src"], destination)
+        else:
+            shutil.copytree(self.paths["conscios_src_lite"], destination)
 
         os.rename(f"{project_dir}{self.sep}Source.ino",
                   f"{project_dir}{self.sep}{project_dir.split(self.sep)[-1]}.ino")
@@ -587,7 +612,7 @@ Sight{self.sep}Settings"""
         Returns:
             string: the path to arduino cli
         """
-        return f"\"{self.path}{self.sep}Externals{self.sep}{self.arduino_cli}\""
+        return f"""\"{self.paths["arduino"]}\""""
 
     def set_dev_file(self):
         """

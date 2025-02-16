@@ -79,3 +79,5 @@ QTextBroswer {
     border: none;
 }
 """
+
+CONSCIOS_GIT = "https://github.com/Sidekick-Robotics/ConsciOS"
