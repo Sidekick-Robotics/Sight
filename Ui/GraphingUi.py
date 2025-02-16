@@ -398,7 +398,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "SideKick"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Sight"))
         self.terminal.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -408,7 +408,7 @@ class Ui_MainWindow(object):
         self.file.setText(_translate("MainWindow", "Menu"))
         self.device.setText(_translate("MainWindow", "Device"))
         self.upload.setText(_translate("MainWindow", "Upload"))
-        self.compile.setText(_translate("MainWindow", "Compile"))
+        self.compile.setText(_translate("MainWindow", "Verify"))
         self.record.setText(_translate("MainWindow", "Record"))
         self.help.setText(_translate("MainWindow", "Help"))
         self.full_screen.setText(_translate("MainWindow", "Expand"))
