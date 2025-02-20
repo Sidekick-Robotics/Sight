@@ -81,3 +81,5 @@ QTextBroswer {
 """
 
 CONSCIOS_GIT = "https://github.com/Sidekick-Robotics/ConsciOS"
+
+VERSION = "https://raw.githubusercontent.com/SideKick-Robotics/Sight-updates/master/version.txt"

@@ -7,6 +7,7 @@ import os
 import re
 import ctypes
 import shutil
+import requests
 import platform
 import json
 
@@ -17,6 +18,7 @@ from globals import SIZES_IN_QSS
 from globals import DEFAULT_SETTINGS, DEFAULT_BOARDS
 from globals import GRAPH_BEGINNING, GRAPH_ENDING
 from globals import CONSCIOS_GIT
+from globals import VERSION
 
 class SaveManager():
     """
@@ -421,6 +423,8 @@ Sight{self.sep}Settings"""
         super(FileManager, self).__init__(arduino_lib_path)
         super(JsonLibraryManager, self).__init__(arduino_board_path)
 
+        print(self.is_latest_version()) # TODO
+
     def define_paths(self):
         """
         Create all of the paths that will be used by the file manager.
@@ -443,6 +447,8 @@ Sight{self.sep}Settings"""
         self.paths["conscios_src_lite"] = f"""{self.paths["conscios"]}{self.sep}Source_lite"""
         self.paths["conscios_lib"] = f"""{self.paths["conscios"]}{self.sep}libraries"""
         self.paths["git"] = f"{self.path}{self.sep}Git{self.sep}cmd{self.sep}git.exe"
+        self.paths["updater"] = f"""{self.path}{self.sep}updater"""
+        self.paths["updater_des"] = f"""{self.paths["appdata"]}{self.sep}updater"""
 
         # User accessible files
         self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
@@ -877,3 +883,51 @@ Sight{self.sep}Settings"""
             stylesheet = stylesheet.replace(str(size) + "px", str(int(size*scale))+ "px")
 
         return stylesheet, scale
+
+    def is_installed(self):
+        """
+        Check if sight is installed.
+        """
+        return "sight.exe" in os.listdir(self.path)
+
+    def is_latest_version(self):
+        """
+        Check from git if the app is running in the latest version.
+
+        Returns:
+            bool: whether or not the app is running in the latest version
+        """
+        response = requests.get(VERSION, timeout=5)
+        response.raise_for_status()
+
+        latest_version = response.text.strip().split(".")
+
+        with open(f"{self.path}{self.sep}version.txt", "r", encoding="UTF-8") as version:
+            current_version = version.readline().split(".")
+
+        for latest, current in zip(latest_version, current_version):
+            if int(latest) > int(current):
+                return False
+            elif int(latest) < int(current):
+                return True
+        return True
+
+    def move_updater(self):
+        """
+        To run the updater, it must be moved to the appdata folder to have access.
+        """
+        if os.path.exists(self.paths["updater_des"]):
+            shutil.rmtree(self.paths["updater_des"])
+        #TODO
+        shutil.copytree(self.paths["updater"], self.paths["updater_des"])
+        shutil.copytree(self.paths["git_tree"], self.paths["updater_des"])
+
+    def update_app(self):
+        """
+        If running the installed application and there is a new version, update.
+        """
+        if self.is_latest_version() or not self.is_installed():
+            return
+
+        self.move_updater()
+        
