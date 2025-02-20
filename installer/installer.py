@@ -1,6 +1,6 @@
 """
 This file has all of the functions necessary to install the SideKick GUI by setting up
-the arduino cli.
+the arduino cli. TODO
 """
 import os
 import requests
@@ -28,7 +28,7 @@ class SideKickInstaller():
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-mac"
             self.documents = f"/Users/{self.user}/documents/"
-            self.arduino = f"/Users/{self.user}/Library/Arduino15//"
+            self.arduino = f"/Users/{self.user}/Library/Arduino15/"
             self.type = ".sh"
 
         elif self.os == "Linux":
