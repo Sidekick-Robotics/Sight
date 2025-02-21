@@ -334,10 +334,10 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
 
         self.user = os.getenv("USER") or os.getenv("USERNAME")
         self.path = os.path.dirname(os.path.realpath(__file__))
-        print(self.path)
+
         if "_internal" in self.path:
             self.path = str(Path(self.path).resolve().parent)
-        print(self.path)
+
         self.save_manager = SaveManager()
         self.dev = dev
         self.consci_os_path = consci_os_path
