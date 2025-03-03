@@ -136,10 +136,48 @@ class MainGUI(qtw.QMainWindow):
         self.file_manager.set_all_boards(self.cli_manager)
         self.reset_supported_boards()
 
+        self.check_thread_timer = None
+
         timer = qtc.QTimer(self)
         timer.setInterval(0)
         timer.timeout.connect(self.update)
         timer.start()
+
+    def prompt_update(self):
+        """
+        Prompt the user to update (not optional for pre-release version).
+        """
+        if self.file_manager.is_latest_version() or not self.file_manager.is_installed():
+            return
+
+        move = threading.Thread(target=self.file_manager.move_updater)
+        move.start()
+
+        # Message box to run while threading
+        msg_box = qtw.QMessageBox(self)
+        msg_box.setIcon(qtw.QMessageBox.Icon.Critical)  # Error icon
+        msg_box.setWindowTitle("Update Required")
+        msg_box.setText("This application needs to be updated to the latest version.")
+        msg_box.setInformativeText("Moving updater to start update...")
+        msg_box.setStandardButtons(qtw.QMessageBox.StandardButton.NoButton)
+
+        msg_box.show()
+
+        # Close ui when thread is done
+        self.check_thread_timer = qtc.QTimer()
+        self.check_thread_timer.timeout.connect(self.check_updater_status)
+        self.check_thread_timer.start(500)
+
+    def check_updater_status(self):
+        """
+        Check if the updater has been moved.
+
+        Args:
+            msg_box: the message box which prompts the user to update.
+        """
+        if self.file_manager.updater_moved:
+            self.check_thread_timer.stop()
+            self.close()
 
     def set_screen_size(self):
         """
@@ -730,6 +768,7 @@ if __name__ == "__main__":
     # Show the main GUI and run the application
     loading_screen.close()
     main_gui.show()
+    main_gui.prompt_update()
     app.exec()
 
     main_gui.close_gui()

@@ -5,14 +5,15 @@ deletion of files.
 
 import os
 import re
-import ctypes
 import shutil
 import requests
 import platform
+import subprocess
 import json
 
 from pathlib import Path
 from PyQt6 import QtWidgets as qtw
+from dulwich.porcelain import clone
 
 from globals import SIZES_IN_QSS
 from globals import DEFAULT_SETTINGS, DEFAULT_BOARDS
@@ -344,6 +345,7 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
         self.current_project = ""
 
         self.board_names = []
+        self.updater_moved = False
 
         # Initialise for each OS
         if operating_system == "Windows":
@@ -423,8 +425,6 @@ Sight{self.sep}Settings"""
         super(FileManager, self).__init__(arduino_lib_path)
         super(JsonLibraryManager, self).__init__(arduino_board_path)
 
-        print(self.is_latest_version()) # TODO
-
     def define_paths(self):
         """
         Create all of the paths that will be used by the file manager.
@@ -446,9 +446,9 @@ Sight{self.sep}Settings"""
         self.paths["conscios_src"] = f"""{self.paths["conscios"]}{self.sep}Source"""
         self.paths["conscios_src_lite"] = f"""{self.paths["conscios"]}{self.sep}Source_lite"""
         self.paths["conscios_lib"] = f"""{self.paths["conscios"]}{self.sep}libraries"""
-        self.paths["git"] = f"{self.path}{self.sep}Git{self.sep}cmd{self.sep}git.exe"
         self.paths["updater"] = f"""{self.path}{self.sep}updater"""
-        self.paths["updater_des"] = f"""{self.paths["appdata"]}{self.sep}updater"""
+        self.paths["updater_des"] = f"""{self.paths["appdata"]}{self.sep}Sight{self.sep}updater"""
+        self.paths["update_exe"] = f"""{self.paths["updater_des"]}{self.sep}update_manager.exe"""
 
         # User accessible files
         self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
@@ -487,31 +487,23 @@ Sight{self.sep}Settings"""
 
         directories = os.listdir(self.paths["settings_path"])
 
-        try:
-            if "settings.txt" not in directories:
-                with open(self.paths["settings"], "x", encoding="UTF-8") as settings:
-                    settings.write(DEFAULT_SETTINGS)
+        if "settings.txt" not in directories:
+            with open(self.paths["settings"], "x", encoding="UTF-8") as settings:
+                settings.write(DEFAULT_SETTINGS)
 
-            if "boards.csv" not in directories:
-                with open(self.paths["boards"], "x", encoding="UTF-8") as _:
-                    pass
-                self.update_boards()
+        if "boards.csv" not in directories:
+            with open(self.paths["boards"], "x", encoding="UTF-8") as _:
+                pass
+            self.update_boards()
 
-            if "stylesheet.qss" not in directories:
-                shutil.copy(self.paths["stylesheet_template"], self.paths["stylesheet"])
-
-        except PermissionError:
-            # Get admin permissions if needed
-            # TODO add message box
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", "python", __file__, None, 1)
-            self.create_sub_sidekick_files()
+        if "stylesheet.qss" not in directories:
+            shutil.copy(self.paths["stylesheet_template"], self.paths["stylesheet"])
 
     def install_conscios(self):
         """
         Using git, if there is no ConsciOS available, clone it.
         """
-        git_cmd = f"""{self.paths["git"]} clone {CONSCIOS_GIT} {self.paths["conscios"]}"""
-        os.system(git_cmd)
+        clone(CONSCIOS_GIT, {self.paths["conscios"]})
 
     def move_source(self, raw_source):
         """
@@ -897,14 +889,19 @@ Sight{self.sep}Settings"""
         Returns:
             bool: whether or not the app is running in the latest version
         """
-        response = requests.get(VERSION, timeout=5)
-        response.raise_for_status()
+        try:
+            response = requests.get(VERSION, timeout=5)
+            response.raise_for_status()
+        except Exception:
+            return True
 
+        # Get the latest version
         latest_version = response.text.strip().split(".")
 
         with open(f"{self.path}{self.sep}version.txt", "r", encoding="UTF-8") as version:
             current_version = version.readline().split(".")
 
+        # Compare the latest to the current version
         for latest, current in zip(latest_version, current_version):
             if int(latest) > int(current):
                 return False
@@ -912,22 +909,41 @@ Sight{self.sep}Settings"""
                 return True
         return True
 
+    def progress_copy(self, src, dst, progress):
+        shutil.copy2(src, dst)
+        progress["copied"] += 1
+        print(f"Progress: {progress['copied']}/{progress['total']} files copied", end="\r")
+
+    def copytree_with_progress(self, src, dst):
+        total_files = sum(len(files) for _, _, files in os.walk(src))
+        progress = {"copied": 0, "total": total_files}
+
+        shutil.copytree(src, dst, copy_function=lambda s, d: self.progress_copy(s, d, progress))
+
+        print("\nCopy completed!")
+        
     def move_updater(self):
         """
         To run the updater, it must be moved to the appdata folder to have access.
         """
+        self.updater_moved = False
+        print("deleting")
         if os.path.exists(self.paths["updater_des"]):
             shutil.rmtree(self.paths["updater_des"])
-        #TODO
-        shutil.copytree(self.paths["updater"], self.paths["updater_des"])
-        shutil.copytree(self.paths["git_tree"], self.paths["updater_des"])
+
+        print("copying")
+        print(self.paths["updater_des"])
+        print("copying updater")
+        self.copytree_with_progress(self.paths["updater"], self.paths["updater_des"])
+        print("copied updater")
+        self.updater_moved = True
+
+        self.update_app()
 
     def update_app(self):
         """
-        If running the installed application and there is a new version, update.
+        Remove the destination directory and clone the git repo.
         """
-        if self.is_latest_version() or not self.is_installed():
-            return
-
-        self.move_updater()
-        
+        subprocess.Popen([self.paths["update_exe"]] + [self.path, self.sep],
+                         creationflags= 0x00000008,
+                         close_fds=True)

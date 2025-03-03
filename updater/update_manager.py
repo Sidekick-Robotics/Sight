@@ -7,15 +7,25 @@ This is currently for windows only!
 import os
 import sys
 import ctypes
-import requests
 import shutil
+
+from dulwich.porcelain import clone
 
 # Git definitions
 GIT_EXE = f".\\Git\\cmd\\git.exe"
 GIT_REPO = f"\"https://github.com/Sidekick-Robotics/Sight-updates\""
 
+def requires_admin():
+    """Check if the updater needs admin permissions."""
+    try:
+        my_file = open(GIT_DES+SEP+"test.txt", "w", encoding="UTF-8")
+        my_file.close()
+    except PermissionError:
+        return True
+    return False
+
 def is_admin():
-    """Check if the updater manager has update permissions"""
+    """Check if the updater manager has admin permissions."""
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
@@ -26,17 +36,17 @@ def run_as_admin():
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
 
 def update_sight():
-    """Git cloen the latest repository."""
-    GIT_CMD = f"{GIT_EXE} clone {GIT_REPO} {GIT_DES}"
-    print(GIT_CMD)
-    os.system(GIT_CMD)
-
+    """Git clone the latest repository."""
+    clone(GIT_REPO, GIT_DES)
 
 if __name__ == "__main__":
-    GIT_DES = f"\"C:\\Program Files (x86)\\Sight\""
+    GIT_DES = sys.argv[1]
+    SEP = sys.argv[2]
 
-    # Run as admin if updating and not admin
-    if not is_admin():
+    print(SEP, GIT_DES)
+
+    # Run as admin if needed
+    if requires_admin() and not is_admin():
         run_as_admin()
         sys.exit()
 
