@@ -503,7 +503,7 @@ Sight{self.sep}Settings"""
         """
         Using git, if there is no ConsciOS available, clone it.
         """
-        clone(CONSCIOS_GIT, {self.paths["conscios"]})
+        clone(CONSCIOS_GIT, self.paths["conscios"])
 
     def move_source(self, raw_source):
         """
