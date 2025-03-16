@@ -36,9 +36,23 @@ def run_as_admin():
     sys_args = f"\"{GIT_DES}\" {SEP}"
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, sys_args, None, 1)
 
+def remove_unins():
+    """Remove the unins000.dat and unins000.exe."""
+    src=[GIT_DES+SEP+"unins000.dat", GIT_DES+SEP+"unins000.exe"]
+    dst="./"
+    for file in src:
+        shutil.copy(file, dst)
+
 def update_sight():
     """Git clone the latest repository."""
     clone(GIT_REPO, GIT_DES)
+
+def replace_unins():
+    """Replace the unins000.dat and unins000.exe."""
+    src=["./unins000.dat", "./unins000.exe"]
+    dst=GIT_DES+SEP
+    for file in src:
+        shutil.copy(file, dst)
 
 if __name__ == "__main__":
     GIT_DES = sys.argv[1]
@@ -54,6 +68,9 @@ if __name__ == "__main__":
         run_as_admin()
         sys.exit()
 
+    # Keep the uninstall files
+    remove_unins()
+
     # Manage the path if the path already exists
     if os.path.exists(GIT_DES):
         try:
@@ -64,5 +81,8 @@ if __name__ == "__main__":
             os.mkdir(GIT_DES)
         except FileExistsError:
             pass
+
+    # Put back the uninstall files
+    replace_unins()
 
     update_sight()

@@ -8,7 +8,6 @@ NOTE: pyinstaller --onedir --noconsole --exclude-module=PyQt5 --icon="./Ui/SideK
 import os
 import sys
 import threading
-import logging
 import time
 import webbrowser
 
@@ -736,24 +735,7 @@ class MainGUI(qtw.QMainWindow):
 
 if __name__ == "__main__":
 
-    # Setup logging
-    logging.basicConfig(
-        filename='error.log',  # Log file name
-        filemode='a',           # Append mode ('w' for overwrite)
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        level=logging.ERROR      # Log only errors and critical issues
-    )
-
-    # Redirect uncaught exceptions to the log file
-    def log_exception(exc_type, exc_value, exc_traceback):
-        if issubclass(exc_type, KeyboardInterrupt):
-            sys.__excepthook__(exc_type, exc_value, exc_traceback)
-            return
-        logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
-
-    sys.excepthook = log_exception
-
-    # When compiling, sometimes multiple instances open - this prevents that
+    # When compiled, sometimes multiple instances open - this prevents that
     shared_memory = qtc.QSharedMemory("MyUniquePyQt6App")
     if shared_memory.attach():
         sys.exit(1)
