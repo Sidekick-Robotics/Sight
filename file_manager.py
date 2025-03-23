@@ -544,7 +544,7 @@ Sight{self.sep}Settings"""
                 return False
         return True
 
-    def move_libraries(self):
+    def move_libraries(self, source=None):
         """
         If the ConsciOS libraries are not present, then we need to copy them from ConsciOS
         Or if the app is being used in development mode
@@ -552,7 +552,10 @@ Sight{self.sep}Settings"""
         Args:
             source (str): the source to the new libraries
         """
-        sk_libraries = os.listdir(self.paths["conscios_lib"])
+        if self.dev:
+            sk_libraries = source
+        else:
+            sk_libraries = os.listdir(self.paths["conscios_lib"])
         arduino_libraries = os.listdir(self.paths["libraries"])
         # Remove libraries already in the directory
         for lib in sk_libraries:
