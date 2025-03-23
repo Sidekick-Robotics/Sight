@@ -462,6 +462,8 @@ Sight{self.sep}Settings"""
         directories = os.listdir(self.paths["documents"])
         if "Sight" not in directories:
             os.mkdir(self.paths["sidekick"])
+        if not os.path.exists(self.paths["libraries"]):
+            os.makedirs(self.paths["libraries"])
 
         directories = os.listdir(self.paths["appdata"])
         if "Sight" not in directories:

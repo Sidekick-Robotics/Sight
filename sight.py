@@ -2,7 +2,8 @@
 This is the main python file responsible for having
 the debugging window open.
 
-NOTE: pyinstaller --onedir --noconsole --exclude-module=PyQt5 --icon="./Ui/SideKick.ico" sight.py
+NOTE: To compile use:
+pyinstaller --onedir --noconsole --exclude-module=PyQt5 --icon="./Ui/SideKick.ico" sight.py
 """
 
 import os
