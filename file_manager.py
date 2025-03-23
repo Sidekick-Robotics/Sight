@@ -9,9 +9,11 @@ import shutil
 import platform
 import subprocess
 import json
-import requests
 
 from pathlib import Path
+
+import requests
+
 from PyQt6 import QtWidgets as qtw
 from dulwich.porcelain import clone
 
@@ -919,7 +921,7 @@ Sight{self.sep}Settings"""
         for latest, current in zip(latest_version, current_version):
             if int(latest) > int(current):
                 return False
-            elif int(latest) < int(current):
+            if int(latest) < int(current):
                 return True
         return True
 
