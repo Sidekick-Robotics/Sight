@@ -6,10 +6,10 @@ deletion of files.
 import os
 import re
 import shutil
-import requests
 import platform
 import subprocess
 import json
+import requests
 
 from pathlib import Path
 from PyQt6 import QtWidgets as qtw
@@ -921,16 +921,16 @@ Sight{self.sep}Settings"""
         return True
 
     def progress_copy(self, src, dst, progress):
+        """Keep a progress update for the user to see something is happening."""
         shutil.copy2(src, dst)
         progress["copied"] += 1
         print(f"Progress: {progress['copied']}/{progress['total']} files copied", end="\r")
 
     def copytree_with_progress(self, src, dst):
+        """Keep a progress update for the user to see something is happening."""
         total_files = sum(len(files) for _, _, files in os.walk(src))
         progress = {"copied": 0, "total": total_files}
-
         shutil.copytree(src, dst, copy_function=lambda s, d: self.progress_copy(s, d, progress))
-
         print("\nCopy completed!")
 
     def move_updater(self):
