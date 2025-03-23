@@ -116,8 +116,6 @@ class Graph:
 
             if -1 < data.count("-") < 2 and -1 < data.count(".") < 2 and is_num:
                 graph_data.append(float(data))
-                if float(data) > 60:
-                    print(data)
             else:
                 graph_data.append(np.nan)
                 print(f"<<< ERROR >>> Decoding graph data! {raw_input}")

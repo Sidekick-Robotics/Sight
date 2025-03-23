@@ -20,21 +20,21 @@ class SideKickInstaller():
         if self.os == "Windows":
             self.sep = "\\"
             self.cli = "..\\Externals\\arduino-cli-windows.exe"
-            self.documents = f"C:\\Users\\{self.user}\\Documents\\"
+            self.libraries = f"C:\\Users\\{self.user}\\Documents\\Arduino"
             self.arduino = f"C:\\Users\\{self.user}\\AppData\\Local\\Arduino15\\"
             self.type = ".bat"
 
         elif self.os == "Darwin":
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-mac"
-            self.documents = f"/Users/{self.user}/documents/"
+            self.libraries = f"/Users/{self.user}/documents/Arduino"
             self.arduino = f"/Users/{self.user}/Library/Arduino15/"
             self.type = ".sh"
 
         elif self.os == "Linux":
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-linux.sh"
-            self.documents = f"/home/{self.user}/Documents/"
+            self.libraries = f"/home/{self.user}/Arduino"
             self.arduino = f"/home/{self.user}/.arduino15/"
             self.type = ".sh"
 
@@ -67,12 +67,11 @@ class SideKickInstaller():
             yaml_file = yaml.read()
 
         downloads = self.arduino + "staging"
-        libraries = self.documents + "SideKick" + self.sep + "Libraries"
 
         directories = f"directories:\n\
         data: {self.arduino }\n\
         downloads: {downloads}\n\
-        user: {libraries}"
+        user: {self.libraries}"
 
         yaml_file = yaml_file.replace("directories:", directories)
 

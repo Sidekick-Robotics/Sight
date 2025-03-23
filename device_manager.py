@@ -81,6 +81,7 @@ class DeviceManager():
     def __init__(self, parent=None):
         self.parent = parent
         self.device = None
+        self.baud = None
         self.port = None
         self.last_port = None
         self.error = None
@@ -105,6 +106,7 @@ class DeviceManager():
     def __call__(self):
         self.device = None
         self.port = None
+        self.baud = None
         self.error = None
         self.target = None
 
@@ -263,9 +265,6 @@ class DeviceManager():
         if not dev:
             try:
                 self.device = serial.Serial(port, baud)
-                #initial_data = b""
-                #while not initial_data:
-                #    initial_data = self.device_data()
             except serial.SerialException as error:
                 self.error = str(error).replace("(","\n").replace(")","\n")
                 print("<<< ERROR >>> " + self.error)
@@ -312,7 +311,7 @@ class DeviceManager():
             self.last_port = self.port
             time.sleep(0.2)
 
-    def connect_serial(self, port="COM1", baud=115200, dev=False):
+    def connect_serial(self, port, baud, dev=False):
         """
         Connects the device in order to read the data coming
         from the SideKick/Teensy/Arduino
@@ -325,7 +324,6 @@ class DeviceManager():
             dev (bool): emulates a device if the user wants
         """
         self()
-
         if dev:
             self.emulating = True
             print("<<< WARNING >>> EMULATING DEVICE")
@@ -334,6 +332,7 @@ class DeviceManager():
         else:
             self.auto_connect = True
             self.target = port
+            self.baud = baud
 
         get_data = threading.Thread(
             target=self.threaded_get_raw_data, args=(port, baud, dev),)
@@ -358,7 +357,7 @@ class DeviceManager():
         # Auto connection
         if not self.connected and self.auto_connect:
             if self.target is not None and (self.target in available_ports):
-                self.connect_serial(self.target)
+                self.connect_serial(self.target, self.baud)
                 time.sleep(1)
 
         return available_ports

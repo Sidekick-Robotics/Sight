@@ -57,11 +57,11 @@ class MainGUI(qtw.QMainWindow):
         self.main_ui.debugger.setVisible(False)
 
         # Disable some features for initial release
-        self.main_ui.sk_lite.setEnabled(True)
+        self.main_ui.sk_lite.setEnabled(False)
         self.main_ui.sk_lite.hide()
         self.main_ui.data_points.hide()
         self.main_ui.label_2.hide()
-
+        self.main_ui.baud_rate.setEditable(True)
         self.set_screen_size()
 
         # Associative classes are initialised here
@@ -314,7 +314,6 @@ class MainGUI(qtw.QMainWindow):
         """
         Updates the top label while uploading or compiling
         """
-
         if self.cli_manager.running:
             self.main_ui.top_update.setStyleSheet("QLabel{font-size:14pt}")
             self.main_ui.top_update.setText(
@@ -337,7 +336,6 @@ class MainGUI(qtw.QMainWindow):
         # adds new items
         for port in self.avaliable_port_list:
             if port not in ports_on_gui:
-                print(port)
                 self.main_ui.com_ports.addItem(port)
 
         # removes old items
@@ -420,7 +418,7 @@ class MainGUI(qtw.QMainWindow):
         """
         self.clear_all_data()
 
-        baud = self.main_ui.baud_rate.itemText(0)
+        baud = self.main_ui.baud_rate.currentText()
 
         if self.device_manager.port == port:
             self.device_manager.terminate_device()

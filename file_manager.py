@@ -348,51 +348,52 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
         self.updater_moved = False
 
         # Initialise for each OS
+        # Windows
         if operating_system == "Windows":
             self.arduino_cli = "arduino-cli-windows.exe"
             self.sep = "\\"
             inc = "C:\\Users\\"
             documents = "Documents"
 
-            arduino_lib_path = f"{inc}{self.user}{self.sep}\
-AppData{self.sep}Local{self.sep}Arduino15{self.sep}library_index.json"
-
-            arduino_board_path = f"{inc}{self.user}{self.sep}\
-AppData{self.sep}Local{self.sep}Arduino15{self.sep}package_index.json"
-
+            arduino_path = f"{inc}{self.user}{self.sep}AppData{self.sep}Local{self.sep}Arduino15"
+        # MacOS
         elif operating_system == "Darwin":
             self.arduino_cli = "arduino-cli-mac"
             self.sep = "/"
             inc = "/Users/"
             documents = "documents"
-
-            arduino_lib_path = f"{inc}{self.user}{self.sep}\
-Library{self.sep}Arduino15{self.sep}library_index.json"
-
-            arduino_board_path = f"{inc}{self.user}{self.sep}\
-Library{self.sep}Arduino15{self.sep}package_index.json"
-
+            arduino_path = f"{inc}{self.user}{self.sep}Library{self.sep}Arduino15"
+        # Linux
         elif operating_system == "Linux":
             self.arduino_cli = "arduino-cli-linux.sh"
             self.sep = "/"
             inc = "/home/"
             documents = "Documents"
-
-            arduino_lib_path = f"{inc}{self.user}{self.sep}.arduino15\
-{self.sep}library_index.json"
-
-            arduino_board_path = f"{inc}{self.user}{self.sep}.arduino15\
-{self.sep}package_index.json"
-
+            arduino_path = f"{inc}{self.user}{self.sep}.arduino15"
         else:
             raise OSError("Invalis OS. Shutting down.")
 
+        # Arduino path definitions
+        arduino_lib_path = f"{arduino_path}{self.sep}library_index.json"
+        arduino_board_path = f"{arduino_path}{self.sep}package_index.json"
         self.paths = {}
 
         # Definitions for paths which are referenced for file locations
-        self.paths["documents"] = f"{inc}{self.user}{self.sep}{documents}"
-        self.paths["sidekick"] = f"""{self.paths["documents"]}{self.sep}Sight"""
+        if os.path.exists(f"{inc}{self.user}{self.sep}{documents}"):
+            self.paths["documents"] = f"{inc}{self.user}{self.sep}{documents}"
+        elif os.path.exists(f"{inc}{self.user}{self.sep}OneDrive{self.sep}{documents}"):
+            self.paths["documents"] = f"{inc}{self.user}{self.sep}OneDrive{self.sep}{documents}"
+        else:
+            os.mkdir(f"{inc}{self.user}{self.sep}{documents}")
+            self.paths["documents"] = f"{inc}{self.user}{self.sep}{documents}"
 
+        # Definition of the library location for Arduino
+        if operating_system == "Linux":
+            self.paths["libraries"] = f"{inc}{self.user}{self.sep}Arduino{self.sep}libraries"
+        else:
+            self.paths["libraries"] = f"""{self.paths["documents"]}{self.sep}Arduino{self.sep}libraries"""
+
+        # Make each os follow the intended file structure for that os
         if operating_system == "Windows":
             self.paths["appdata"] = f"{inc}{self.user}{self.sep}AppData{self.sep}Local"
             self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}\
@@ -416,7 +417,7 @@ Sight{self.sep}Settings"""
         if dev:
             print("<<< WARNING >>> THIS APP IS CURRENTLY IN DEVELOPMENT MODE")
             self.move_libraries(consci_os_path)
-        elif len(os.listdir(self.paths["libraries"])) == 0:
+        elif not self.libraries_installed():
             self.move_libraries()
 
         self.load_boards_csv()
@@ -430,6 +431,7 @@ Sight{self.sep}Settings"""
         Create all of the paths that will be used by the file manager.
         """
         # Definitions of file locations
+        self.paths["sidekick"] = f"""{self.paths["documents"]}{self.sep}Sight"""
         self.paths["boards"] = f"""{self.paths["settings_path"]}\
 {self.sep}boards.csv"""
         self.paths["settings"] = f"""{self.paths["settings_path"]}\
@@ -452,12 +454,10 @@ Sight{self.sep}Settings"""
 
         # User accessible files
         self.paths["projects"] = f"""{self.paths["sidekick"]}{self.sep}Projects"""
-        self.paths["libraries"] = f"""{self.paths["sidekick"]}{self.sep}Libraries"""
 
     def create_sidekick_files(self):
         """
         Creates sidekick directory in documents if it does not already exist
-        TODO tidy this up
         """
         directories = os.listdir(self.paths["documents"])
         if "Sight" not in directories:
@@ -466,8 +466,7 @@ Sight{self.sep}Settings"""
         directories = os.listdir(self.paths["appdata"])
         if "Sight" not in directories:
             os.makedirs(self.paths["settings_path"])
-
-        if not os.path.exists(self.paths["conscios"]):
+        if not os.path.exists(self.paths["conscios"]) or len(os.listdir(self.paths["conscios_lib"])) < 3:
             self.install_conscios()
 
     def create_sub_sidekick_files(self):
@@ -482,8 +481,6 @@ Sight{self.sep}Settings"""
             os.mkdir(self.paths["projects"])
         if "Saves" not in directories:
             os.mkdir(self.save_manager.save_folder_path)
-        if "Libraries" not in directories:
-            os.mkdir(self.paths["libraries"])
 
         directories = os.listdir(self.paths["settings_path"])
 
@@ -503,6 +500,10 @@ Sight{self.sep}Settings"""
         """
         Using git, if there is no ConsciOS available, clone it.
         """
+        try:
+            shutil.rmtree( self.paths["conscios"])
+        except FileNotFoundError:
+            pass
         clone(CONSCIOS_GIT, self.paths["conscios"])
 
     def move_source(self, raw_source):
@@ -525,6 +526,20 @@ Sight{self.sep}Settings"""
 
         shutil.copytree(source, self.paths["conscios_src"])
 
+    def libraries_installed(self) -> bool:
+        """
+        Check if libraries are installed.
+        
+        Returns:
+            bool: if the libraries are instaleld or not.
+        """
+        sk_libraries = os.listdir(self.paths["conscios_lib"])
+        arduino_libraries = os.listdir(self.paths["libraries"])
+        for lib in sk_libraries:
+            if "." not in lib and lib not in arduino_libraries:
+                return False
+        return True
+
     def move_libraries(self, source=None):
         """
         If the ConsciOS libraries are not present, then we need to copy them from ConsciOS
@@ -533,25 +548,17 @@ Sight{self.sep}Settings"""
         Args:
             source (str): the source to the new libraries
         """
-
-        if "libraries" not in os.listdir(self.paths["libraries"]):
-            os.mkdir(f"""{self.paths["libraries"]}{self.sep}libraries""")
-
-        destination = f"""{self.paths["libraries"]}{self.sep}libraries"""
-
-        if source is None:
-            source = self.paths["conscios_lib"]
-        else:
-            source += f"{self.sep}libraries"
-
-        for library in os.listdir(source):
-            if "." in library:
-                continue
-
-            if library in os.listdir(destination):
-                shutil.rmtree(f"{destination}{self.sep}{library}")
-
-            shutil.copytree(f"{source}{self.sep}{library}", f"{destination}{self.sep}{library}")
+        sk_libraries = os.listdir(self.paths["conscios_lib"])
+        arduino_libraries = os.listdir(self.paths["libraries"])
+        # Remove libraries already in the directory
+        for lib in sk_libraries:
+            if "." not in lib and lib in arduino_libraries:
+                shutil.rmtree(f"""{self.paths["libraries"]}{self.sep}{lib}""")
+        # Move all libraries to the libraries file
+        for lib in sk_libraries:
+            if "." not in lib:
+                shutil.copytree(f"""{self.paths["conscios_lib"]}{self.sep}{lib}""",
+                            f"""{self.paths["libraries"]}{self.sep}{lib}""")
 
     def get_all_projects(self):
         """

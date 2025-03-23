@@ -17,12 +17,11 @@ def change_user():
         yaml_file = yaml.read()
 
     downloads = ARDUINO + "staging"
-    libraries = DOCUMENTS + "SideKick" + SEP + "Libraries"
 
     directories = f"directories:\n\
     data: {ARDUINO}\n\
     downloads: {downloads}\n\
-    user: {libraries}"
+    user: {LIBRARIES}"
 
     yaml_file = yaml_file.replace("directories:", directories)
 
@@ -44,18 +43,20 @@ def install_boards():
     os.system(CLI + " core install arduino:mbed_rp2040")
 
 if __name__ == "__main__":
-    print("RUNNING - printing current paths:")
-    print(os.listdir("..\\"))
-    time.sleep(3)
+    print("<<< RUNNING >>> Starting install")
+    time.sleep(2)
 
     USER = os.getlogin()
 
     SEP = "\\"
     CLI = "..\\Externals\\arduino-cli-windows.exe"
-    DOCUMENTS = f"C:\\Users\\{USER}\\Documents\\"
+    LIBRARIES = f"C:\\Users\\{USER}\\Documents\\Arduino"
     ARDUINO = f"C:\\Users\\{USER}\\AppData\\Local\\Arduino15\\"
     TYPE = ".bat"
 
     os.system(CLI + " config init")
     change_user()
     install_boards()
+
+    print("""<<< DONE >>>""")
+    time.sleep(2)
