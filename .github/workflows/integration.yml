@@ -58,7 +58,7 @@ jobs:
 
     - name: Install sidekick and arduino
       run: |
-        cd ./Installer
+        cd ./installer
         python ./installer.py
         cd ..
 
