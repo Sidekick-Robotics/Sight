@@ -544,7 +544,7 @@ Sight{self.sep}Settings"""
                 return False
         return True
 
-    def move_libraries(self, source=None):
+    def move_libraries(self):
         """
         If the ConsciOS libraries are not present, then we need to copy them from ConsciOS
         Or if the app is being used in development mode
