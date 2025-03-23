@@ -961,5 +961,5 @@ Sight{self.sep}Settings"""
         """
         with subprocess.Popen([self.paths["update_exe"]] + [self.path, self.sep],
                          creationflags= 0x00000008,
-                         close_fds=True) as process:
+                         close_fds=True) as _:
             pass
