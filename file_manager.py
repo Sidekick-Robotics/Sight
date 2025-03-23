@@ -391,7 +391,8 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
         if operating_system == "Linux":
             self.paths["libraries"] = f"{inc}{self.user}{self.sep}Arduino{self.sep}libraries"
         else:
-            self.paths["libraries"] = f"""{self.paths["documents"]}{self.sep}Arduino{self.sep}libraries"""
+            self.paths["libraries"] = f"""{self.paths["documents"]}{self.sep}Arduino{self.sep}\
+libraries"""
 
         # Make each os follow the intended file structure for that os
         if operating_system == "Windows":
@@ -468,7 +469,8 @@ Sight{self.sep}Settings"""
         directories = os.listdir(self.paths["appdata"])
         if "Sight" not in directories:
             os.makedirs(self.paths["settings_path"])
-        if not os.path.exists(self.paths["conscios"]) or len(os.listdir(self.paths["conscios_lib"])) < 3:
+        if not os.path.exists(self.paths["conscios"]) or len(os.listdir(
+            self.paths["conscios_lib"])) < 3:
             self.install_conscios()
 
     def create_sub_sidekick_files(self):
@@ -930,7 +932,7 @@ Sight{self.sep}Settings"""
         shutil.copytree(src, dst, copy_function=lambda s, d: self.progress_copy(s, d, progress))
 
         print("\nCopy completed!")
-        
+
     def move_updater(self):
         """
         To run the updater, it must be moved to the appdata folder to have access.
