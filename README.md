@@ -1,11 +1,11 @@
+<div align="center"><h1>Sight</h1></div>
 <div align="center">
 <img src="./Ui/SideKick_Logo.png" style="width:40%;">
 </div>
+<div align="center">Making software development easier for embedded systems.</div>
 <p align="center">
   <img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/pylint.yml/badge.svg" alt="PyLint">&nbsp;&nbsp;&nbsp;<img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/integration.yml/badge.svg" alt="integration">
 </p>
-<div align="center"><h1>Sight</h1></div>
-<div align="center">Making software development easier for embedded systems.</div>
 <div align="center"><h2>Contents</h2></div>
 
 1. <a href="#installation">Installation</a>
