@@ -58,8 +58,6 @@ class MainGUI(qtw.QMainWindow):
         self.main_ui.debugger.setVisible(False)
 
         # Disable some features for initial release
-        self.main_ui.sk_lite.setEnabled(False)
-        self.main_ui.sk_lite.hide()
         self.main_ui.data_points.hide()
         self.main_ui.label_2.hide()
         self.main_ui.baud_rate.setEditable(True)
@@ -73,6 +71,11 @@ class MainGUI(qtw.QMainWindow):
 
         board, project, lite = self.file_manager.load_options()
         self.sk_lite = SideKickLite(self.main_ui.sk_lite, lite)
+
+        # Disable full consciOS as it is still under development
+        self.main_ui.sk_lite.setEnabled(True)
+        self.main_ui.sk_lite.hide()
+        self.sk_lite.update_state()
 
         self.cli_manager = CliManager(self.file_manager.paths["arduino"])
 
@@ -406,7 +409,7 @@ class MainGUI(qtw.QMainWindow):
                             'Create Folder', self.file_manager.paths["projects"], 'Folders (*)')[0]
 
         if folder_path:
-            self.file_manager.add_new_project(folder_path, main_gui.sk_lite.state)
+            self.file_manager.add_new_project(folder_path, self.sk_lite.state)
 
     def connect_device(self, port, last_device_flag=False):
         """
