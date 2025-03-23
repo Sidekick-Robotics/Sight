@@ -5,13 +5,13 @@ import os
 import sys
 import unittest
 
-parent = os.path.abspath('.')
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(1, parent)
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtTest import QTest
 
-from main import MainGUI
+from sight import MainGUI
 
 app = QApplication(sys.argv)
 

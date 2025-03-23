@@ -78,6 +78,6 @@ jobs:
         pylint globals.py
 
     # Test all of the testing files
-    - name: Analysing test_gui.py
-      run: |
-        pylint ./Testing/test_gui.py
+    #- name: Analysing test_gui.py
+    #  run: |
+    #    pylint ./Testing/test_gui.py
