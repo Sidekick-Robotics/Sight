@@ -28,13 +28,14 @@ class CliManager:
         self.running = False
         self.enabled = True
 
-        process = multiprocessing.Process(target=self.update_if_signal)  # Run the function in a separate process
+        process = multiprocessing.Process(target=self.update_if_signal)
         process.start()
-        process.join(10)  # Wait for the process to finish within the timeout
+        process.join(10)
+
         if process.is_alive():
             print("Timeout reached, terminating process...")
-            process.terminate()  # Forcefully terminate the process if it exceeds timeout
-            process.join()  # Ensure the process has been cleaned up
+            process.terminate()
+            process.join()
         else:
             print("Function completed successfully")
 
