@@ -396,13 +396,13 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
             self.paths["libraries"] = f"""{self.paths["documents"]}{self.sep}Arduino{self.sep}\
 libraries"""
 
-        # Make each os follow the intended file structure for that os
+        # TODO make each os follow the intended file structure for that os
         if operating_system == "Windows":
             self.paths["appdata"] = f"{inc}{self.user}{self.sep}AppData{self.sep}Local"
             self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}\
 Sight{self.sep}Settings"""
         else:
-            # TODO make application follow normal file directories for Linux\unix
+            # Make application follow normal file directories for Linux\unix
             self.paths["appdata"] = f"{self.path}"
             self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}Settings"""
 
@@ -727,7 +727,6 @@ Sight{self.sep}Settings"""
         Gets all of the boards from ./Ui/boards.csv so
         that they can be displayed on the GUI.
         """
-        # TODO speed this up.
         with open(self.paths["boards"], "r", encoding="UTF-8") as boards:
             for line in boards:
                 self.board_names.append(line.strip().split(", "))
@@ -960,6 +959,7 @@ Sight{self.sep}Settings"""
         """
         Remove the destination directory and clone the git repo.
         """
-        subprocess.Popen([self.paths["update_exe"]] + [self.path, self.sep],
+        with subprocess.Popen([self.paths["update_exe"]] + [self.path, self.sep],
                          creationflags= 0x00000008,
-                         close_fds=True)
+                         close_fds=True) as process:
+            pass
