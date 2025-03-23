@@ -1,10 +1,12 @@
-<center><img src="./Ui/SideKick_Logo.png" style="width:40%;"></center>
+<div align="center">
+<img src="./Ui/SideKick_Logo.png" style="width:40%;">
+</div>
 <p align="center">
   <img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/pylint.yml/badge.svg" alt="PyLint">&nbsp;&nbsp;&nbsp;<img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/integration.yml/badge.svg" alt="integration">
 </p>
-<center><h1>Sight</h1></center>
-<center>Making software development easier for embedded systems.</center>
-<center><h2>Contents</h2></center>
+<div align="center"><h1>Sight</h1></div>
+<div align="center">Making software development easier for embedded systems.</div>
+<div align="center"><h2>Contents</h2></div>
 
 1. <a href="#installation">Installation</a>
     1. <a href="#windows">Windows</a>
@@ -27,12 +29,12 @@
 3. <a href="#reporting-bugs">Reporting Bugs</a>
 5. <a href="#contributing">Contributing</a>
 
-<center><h2 id="installation">Installation</h2></center>
+<div align="center"><h2 id="installation">Installation</h2></div>
 <h3 id="windows">Windows</h3>
 
 <h3 id="development">Development</h3>
 
-<center><h2 id="instructions">Instructions</h2></center>
+<div align="center"><h2 id="instructions">Instructions</h2></div>
 <h3 id="home-screen">Home screen</h3>
 
 <h4 id="terminal">Terminal</h4>
@@ -61,6 +63,6 @@
 
 <h3 id="arduino-cli">Arduino CLI</h3>
 
-<center><h2 id="reporting-bugs">Reporting Bugs</h2></center>
+<div align="center"><h2 id="reporting-bugs">Reporting Bugs</h2></div>
 
-<center><h2 id="contributing">Contributing</h2></center>
+<div align="center"><h2 id="contributing">Contributing</h2></div>
