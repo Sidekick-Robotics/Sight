@@ -396,7 +396,7 @@ class FileManager(JsonLibraryManager, JsonBoardsManager):
             self.paths["libraries"] = f"""{self.paths["documents"]}{self.sep}Arduino{self.sep}\
 libraries"""
 
-        # TODO make each os follow the intended file structure for that os
+        # TODO make each os follow the intended file structure for that os pylint: disable=fixme
         if operating_system == "Windows":
             self.paths["appdata"] = f"{inc}{self.user}{self.sep}AppData{self.sep}Local"
             self.paths["settings_path"] = f"""{self.paths["appdata"]}{self.sep}\
