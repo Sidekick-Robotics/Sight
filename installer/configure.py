@@ -50,7 +50,12 @@ if __name__ == "__main__":
 
     SEP = "\\"
     CLI = "..\\Externals\\arduino-cli-windows.exe"
-    LIBRARIES = f"C:\\Users\\{USER}\\Documents\\Arduino"
+
+    if os.path.exists(f"C:\\Users\\{USER}\\OneDrive\\Documents"):
+        LIBRARIES = f"C:\\Users\\{USER}\\OneDrive\\Documents\\Arduino"
+    else:
+        LIBRARIES = f"C:\\Users\\{USER}\\Documents\\Arduino"
+
     ARDUINO = f"C:\\Users\\{USER}\\AppData\\Local\\Arduino15\\"
     TYPE = ".bat"
 
