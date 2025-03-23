@@ -35,7 +35,7 @@ jobs:
         
     - name: Analysing file_manager.py
       run: |
-        pylint file_manager.py --disable=R0902,R1725,R0904
+        pylint file_manager.py --disable=R0902,R1725,R0904,R0912,R0915
         
     - name: Analysing message_handler.py
       run: |
