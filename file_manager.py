@@ -906,7 +906,7 @@ Sight{self.sep}Settings"""
         try:
             response = requests.get(VERSION, timeout=5)
             response.raise_for_status()
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return True
 
         # Get the latest version
