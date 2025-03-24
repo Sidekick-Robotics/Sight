@@ -23,14 +23,13 @@ class SideKickInstaller():
             self.libraries = f"C:\\Users\\{self.user}\\Documents\\Arduino"
             self.arduino = f"C:\\Users\\{self.user}\\AppData\\Local\\Arduino15\\"
             self.type = ".bat"
-
         elif self.os == "Darwin":
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-mac"
             self.libraries = f"/Users/{self.user}/documents/Arduino"
             self.arduino = f"/Users/{self.user}/Library/Arduino15/"
             self.type = ".sh"
-
+            os.system(f"chmod +x {self.cli}")
         elif self.os == "Linux":
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-linux.sh"
