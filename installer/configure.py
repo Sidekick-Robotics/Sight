@@ -51,7 +51,8 @@ if __name__ == "__main__":
     SEP = "\\"
     CLI = "..\\Externals\\arduino-cli-windows.exe"
 
-    if os.path.exists(f"C:\\Users\\{USER}\\OneDrive\\Documents"):
+    if os.path.exists(f"C:\\Users\\{USER}\\OneDrive\\Documents") and not os.path.exists(
+        f"C:\\Users\\{USER}\\Documents"):
         LIBRARIES = f"C:\\Users\\{USER}\\OneDrive\\Documents\\Arduino"
     else:
         LIBRARIES = f"C:\\Users\\{USER}\\Documents\\Arduino"
