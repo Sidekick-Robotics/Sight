@@ -508,9 +508,9 @@ Sight{self.sep}Settings"""
         """
         try:
             shutil.rmtree(self.paths["conscios"])
-            os.makedirs(self.paths["conscios"])
         except FileNotFoundError:
             pass
+        os.makedirs(self.paths["conscios"])
         clone(CONSCIOS_GIT, self.paths["conscios"])
 
     def move_source(self, raw_source):
