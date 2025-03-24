@@ -507,7 +507,8 @@ Sight{self.sep}Settings"""
         Using git, if there is no ConsciOS available, clone it.
         """
         try:
-            shutil.rmtree( self.paths["conscios"])
+            shutil.rmtree(self.paths["conscios"])
+            os.makedirs(self.paths["conscios"])
         except FileNotFoundError:
             pass
         clone(CONSCIOS_GIT, self.paths["conscios"])
