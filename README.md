@@ -1,8 +1,9 @@
-<div align="center"><h1>Sight</h1></div>
 <div align="center">
-<img src="./Ui/SideKick_Logo.png" style="width:40%;">
+<img src="./Ui/SideKick_Logo.png" style="width:30%;">
 </div>
+<div align="center"><h1>Sight</h1></div>
 <div align="center">Making software development easier for embedded systems.</div>
+<br>
 <p align="center">
   <img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/pylint.yml/badge.svg" alt="PyLint">&nbsp;&nbsp;&nbsp;<img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/integration.yml/badge.svg" alt="integration">
 </p>
