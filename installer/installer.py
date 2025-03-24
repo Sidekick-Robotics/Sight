@@ -23,27 +23,24 @@ class SideKickInstaller():
             self.libraries = f"C:\\Users\\{self.user}\\Documents\\Arduino"
             self.arduino = f"C:\\Users\\{self.user}\\AppData\\Local\\Arduino15\\"
             self.type = ".bat"
-
+            os.system(f"{self.cli} config init")
         elif self.os == "Darwin":
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-mac"
             self.libraries = f"/Users/{self.user}/documents/Arduino"
             self.arduino = f"/Users/{self.user}/Library/Arduino15/"
             self.type = ".sh"
-
+            os.system(f"chmod +x {self.cli} config init")
         elif self.os == "Linux":
             self.sep = "/"
             self.cli = "../Externals/arduino-cli-linux.sh"
             self.libraries = f"/home/{self.user}/Arduino"
             self.arduino = f"/home/{self.user}/.arduino15/"
             self.type = ".sh"
-
+            os.system(f"chmod +x {self.cli} config init")
         else:
             print(f"<<< ERROR >>> OS {self.os} is not yet supported")
             exit()
-
-        print(f"{self.cli} config init")
-        os.system(f"{self.cli} config init")
 
         self.clone_teensy_package_file()
 
