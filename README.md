@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./Ui/SideKick_Logo.png" style="width:30%;">
+<img src="./Ui/SideKick_Logo.png" style="width:20%;">
 </div>
 <div align="center"><h1>Sight</h1></div>
 <div align="center">Making software development easier for embedded systems.</div>
