@@ -11,6 +11,8 @@
 
 1. <a href="#installation">Installation</a>
     1. <a href="#windows">Windows</a>
+        1. <a href="#instructions">Instructions</a>
+        2. <a href="#updates">Updates</a>
     2. <a href="#development">Development</a>
 2. <a href="#instructions">Instructions</a>
     1. <a href="#home-screen">Home screen</a>
@@ -32,8 +34,20 @@
 
 <div align="center"><h2 id="installation">Installation</h2></div>
 <h3 id="windows">Windows</h3>
+The Sight app currently only has an installer/release for windows as it is currently undergoing beta testing. Due to this, there are some warning when downloading and running the installer - this is normal!
+
+<h4 id="instructions">Instructions</h4>
+
+1. Download the Sight installer from <a href="https://github.com/Sidekick-Robotics/Sight/releases/latest">here</a>.
+2. Run the "sight_installer.exe" file and follow the instructions.
+3. Let the installer run and do not close down any of the windows including the CMD prompt that opens - this runs the arduino configuration.
+4. After the install has finished, run Sight.
+
+<h4 id="updates">Updates</h4>
+Once sight is installed, it checks for updates on the GitHub repository. If there is an updates, the application will close with a warning and open a CMD window - this is currently the udpater. The updater will uninstall the application and clone the GitHub repository. This can look like the application is not working as it is currently under development however, DO NOT CLOSE THE WINDOW - it is downloading the new version.
 
 <h3 id="development">Development</h3>
+TODO
 
 <div align="center"><h2 id="instructions">Instructions</h2></div>
 <h3 id="home-screen">Home screen</h3>
