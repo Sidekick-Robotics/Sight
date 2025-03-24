@@ -42,7 +42,8 @@ class SideKickInstaller():
             print(f"<<< ERROR >>> OS {self.os} is not yet supported")
             exit()
 
-        os.system(self.cli + " config init")
+        print(f"{self.cli} config init")
+        os.system(f"{self.cli} config init")
 
         self.clone_teensy_package_file()
 
