@@ -7,6 +7,9 @@
 <p align="center">
   <img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/pylint.yml/badge.svg" alt="PyLint">&nbsp;&nbsp;&nbsp;<img src="https://github.com/Sidekick-Robotics/Sight/actions/workflows/integration.yml/badge.svg" alt="integration">
 </p>
+<p align="center">
+  <img src="./.github/img/sight_main.png">
+</p>
 <div align="center"><h2>Contents</h2></div>
 
 1. <a href="#installation">Installation</a>
